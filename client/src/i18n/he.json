@@ -22,7 +22,7 @@
   "about.manualHint": "ראו את MANUAL.md בתיקיית הפרויקט להוראות מלאות שלב אחר שלב.",
   "about.license": "רישיון",
   "about.licenseHint": "כל הזכויות שמורות. ראו את קובץ LICENSE.",
-  "about.credits": "נבנה על ידי russcore · Fastify + React + Prisma/SQLite",
+  "about.credits": "נבנה על ידי Victor Prusakov · Fastify + React + Prisma/SQLite",
   "about.f.grouping": "חלוקה אוטומטית לקטגוריות גיל, משקל ומגדר בסגנון WKF",
   "about.f.brackets": "עצי נוק-אאוט (עד 8) עם קרב על מדליית ארד",
   "about.f.live": "עדכונים חיים בכל המסכים דרך WebSocket",

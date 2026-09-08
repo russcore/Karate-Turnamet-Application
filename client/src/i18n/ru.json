@@ -22,7 +22,7 @@
   "about.manualHint": "См. MANUAL.md в папке проекта для полной пошаговой инструкции.",
   "about.license": "Лицензия",
   "about.licenseHint": "Все права защищены. См. файл LICENSE.",
-  "about.credits": "Разработано russcore · Fastify + React + Prisma/SQLite",
+  "about.credits": "Разработано Victor Prusakov · Fastify + React + Prisma/SQLite",
   "about.f.grouping": "ИИ-группировка по возрастным, весовым и половым дивизионам в стиле WKF",
   "about.f.brackets": "Сетки на выбывание (до 8) с боем за бронзу",
   "about.f.live": "Живое обновление на всех экранах через WebSocket",

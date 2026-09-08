@@ -22,7 +22,7 @@
   "about.manualHint": "See MANUAL.md in the project folder for full step-by-step instructions.",
   "about.license": "License",
   "about.licenseHint": "All rights reserved. See the LICENSE file.",
-  "about.credits": "Built by russcore · Fastify + React + Prisma/SQLite",
+  "about.credits": "Built by Victor Prusakov · Fastify + React + Prisma/SQLite",
   "about.f.grouping": "AI auto-grouping into WKF-style age, weight and gender divisions",
   "about.f.brackets": "Single-elimination brackets (up to 8) with a bronze match",
   "about.f.live": "Live updates across every screen over WebSocket",

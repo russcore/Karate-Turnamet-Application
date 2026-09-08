@@ -73,7 +73,7 @@ export default function About() {
         </div>
         <div className="card p-4">
           <div className="text-sm font-semibold text-slate-700">⚖ {t('about.license')}</div>
-          <p className="mt-1 text-xs text-slate-500">© {new Date().getFullYear()} russcore · {t('about.licenseHint')}</p>
+          <p className="mt-1 text-xs text-slate-500">© {new Date().getFullYear()} Victor Prusakov · {t('about.licenseHint')}</p>
         </div>
       </div>
 

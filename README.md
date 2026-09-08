@@ -100,4 +100,4 @@ github.com and pass its URL:
 
 ---
 
-© 2026 russcore. See [LICENSE](LICENSE).
+© 2026 Victor Prusakov. See [LICENSE](LICENSE).

@@ -330,4 +330,4 @@ repo yourself and pass its URL:
 
 ---
 
-© 2026 russcore. Licensed under the terms in [LICENSE](LICENSE).
+© 2026 Victor Prusakov. Licensed under the terms in [LICENSE](LICENSE).
