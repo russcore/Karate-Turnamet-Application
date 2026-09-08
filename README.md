@@ -25,6 +25,17 @@ you can copy the whole folder to any machine with Node.js and it just runs.
 > The installer creates `server\.env` with a unique JWT secret, sets up the SQLite
 > database, seeds the first admin, and builds the app.
 
+### 🔑 Default login
+
+| Role | Username | Password |
+|---|---|---|
+| **Admin** | `admin` | `admin123` |
+| Arena editor *(demo only — `seed:demo`)* | `tatami1`, `tatami2`, `tatami3` | `tatami123` |
+
+> ⚠️ **Change the admin password right after your first login** (Configuration → Users),
+> especially before putting the app on a network. To seed different credentials, set
+> `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `server\.env` **before** running the seed.
+
 ### Manual install (any OS)
 
 ```bash

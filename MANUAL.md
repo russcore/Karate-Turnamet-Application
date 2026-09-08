@@ -100,7 +100,16 @@ npm run build
 
 ## 5. Logging in & roles
 
-Open the app and log in with your credentials.
+Open the app and log in. The seed creates these default accounts:
+
+| Role | Username | Password |
+|---|---|---|
+| **Admin** | `admin` | `admin123` |
+| Arena editor *(only with `npm run seed:demo`)* | `tatami1`, `tatami2`, `tatami3` | `tatami123` |
+
+> ⚠️ **Change the admin password immediately** after the first login (Configuration →
+> Users), especially before exposing the app on a network. You can seed different admin
+> credentials by setting `ADMIN_USERNAME` / `ADMIN_PASSWORD` in `server/.env` before seeding.
 
 | Role | Can do |
 |---|---|
