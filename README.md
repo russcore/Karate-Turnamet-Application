@@ -84,19 +84,6 @@ No database server, no containers — everything travels in the folder.
 
 ---
 
-## 🔐 Publishing to a private Git repository
-
-Run **`publish-to-github.bat`** (or `publish-to-github.ps1`). It initialises git,
-verifies that secrets (`.env`) and local data are never committed, and creates a
-**private** GitHub repo via the GitHub CLI. No CLI? Create an empty private repo on
-github.com and pass its URL:
-
-```powershell
-.\publish-to-github.ps1 -RemoteUrl https://github.com/<you>/karate-tournament.git
-```
-
----
-
 ## 🛠️ Useful scripts
 
 | Command | What it does |
@@ -108,6 +95,17 @@ github.com and pass its URL:
 | `npm run seed:demo` | Same, plus 200 synthetic demo fighters |
 | `npm test` | Run the backend test suite |
 | `npm run prisma:push` | Sync the SQLite schema |
+
+---
+
+## ☕ Support
+
+If you find this project useful, you can support its development:
+
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.me/YOUR_PAYPAL_USERNAME)
+
+> **Placeholder** — replace `YOUR_PAYPAL_USERNAME` in the link above with your PayPal.Me
+> handle (e.g. `paypal.me/victorprusakov`) once your PayPal donation link is set up.
 
 ---
 
