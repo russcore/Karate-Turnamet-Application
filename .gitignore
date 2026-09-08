@@ -1,0 +1,20 @@
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+
+# Local data + uploads travel with the folder, but keep them out of git
+data/*.sqlite
+data/*.sqlite-journal
+data/*.db
+uploads/*
+!uploads/.gitkeep
+
+# Env
+.env
+server/.env
+
+# Prisma
+server/prisma/*.sqlite
+server/src/generated/

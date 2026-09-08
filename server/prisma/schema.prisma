@@ -1,0 +1,245 @@
+// Karate tournament — SQLite schema (portable, no Docker).
+// Array/JSON fields from the original spec are modeled as relation tables or JSON-in-TEXT
+// so everything runs on SQLite. See services/ for (de)serialization of the TEXT-JSON fields.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id                 Int      @id @default(autoincrement())
+  title              String   @default("Karate Tournament")
+  subtitle           String?
+  logoPath           String?
+  accentColor        String   @default("#e11d48")
+  bronzeMode         String   @default("single") // "single" | "double"
+  defaultTatamiImage String?
+  cornerAName        String   @default("AO") // top fighter corner (blue by default)
+  cornerAColor       String   @default("#2563eb")
+  cornerBName        String   @default("AKA") // bottom fighter corner (red by default)
+  cornerBColor       String   @default("#dc2626")
+  createdAt          DateTime @default(now())
+
+  tatamis    Tatami[]
+  ranks      Rank[]
+  fighters   Fighter[]
+  categories Category[]
+  imports    ImportBatch[]
+}
+
+model Tatami {
+  id        Int     @id @default(autoincrement())
+  eventId   Int
+  name      String
+  imagePath String?
+  order     Int     @default(0)
+  enabled   Boolean @default(true)
+
+  event      Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  users      UserTatami[]
+  categories Category[]
+}
+
+model Rank {
+  id          Int     @id @default(autoincrement())
+  eventId     Int
+  name        String
+  beltColor   String  @default("#000000")
+  stripeColor String? // e.g. black stripe on an orange belt, or yellow stripes on a dan belt
+  stripeCount Int     @default(0) // number of stripes; 0 = none
+  order       Int     @default(0)
+  shortCode   String?
+
+  event     Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  aliases   RankAlias[]
+  fighters  Fighter[]             @relation("FighterRank")
+  teacherOf Fighter[]             @relation("TeacherRank")
+  allowedIn CategoryAllowedRank[]
+}
+
+model RankAlias {
+  id     Int    @id @default(autoincrement())
+  rankId Int
+  value  String
+  rank   Rank   @relation(fields: [rankId], references: [id], onDelete: Cascade)
+
+  @@unique([rankId, value])
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("tatami_editor") // admin | tatami_editor | viewer
+  displayName  String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  tatamis   UserTatami[]
+  auditLogs AuditLog[]
+}
+
+model UserTatami {
+  userId   Int
+  tatamiId Int
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tatami   Tatami @relation(fields: [tatamiId], references: [id], onDelete: Cascade)
+
+  @@id([userId, tatamiId])
+}
+
+model Fighter {
+  id            Int      @id @default(autoincrement())
+  eventId       Int
+  firstName     String
+  lastName      String
+  school        String?
+  teacherName   String?
+  teacherRankId Int?
+  rankId        Int
+  age           Int
+  weight        Float
+  gender        String? // "M" | "F" | null
+  city          String?
+  country       String?
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  event       Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  rank        Rank            @relation("FighterRank", fields: [rankId], references: [id])
+  teacherRank Rank?           @relation("TeacherRank", fields: [teacherRankId], references: [id])
+  entries     CategoryEntry[]
+}
+
+model Category {
+  id         Int     @id @default(autoincrement())
+  eventId    Int
+  name       String
+  discipline String  @default("kumite") // kumite | kata
+  gender     String? // M | F | null (mixed)
+  ageMin     Int?
+  ageMax     Int?
+  weightMin  Float?
+  weightMax  Float?
+  tatamiId   Int?
+  order      Int     @default(0)
+  boutDurationSec Int @default(90) // configurable fight time for this group
+  isSpecial  Boolean @default(false) // a manual "special bout", listed separately from real groups
+  status     String  @default("pending") // pending | in_progress | done
+
+  event        Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tatami       Tatami?               @relation(fields: [tatamiId], references: [id], onDelete: SetNull)
+  allowedRanks CategoryAllowedRank[]
+  entries      CategoryEntry[]
+  bracket      Bracket?
+  placements   Placement[]
+}
+
+model CategoryAllowedRank {
+  categoryId Int
+  rankId     Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  rank       Rank     @relation(fields: [rankId], references: [id], onDelete: Cascade)
+
+  @@id([categoryId, rankId])
+}
+
+model CategoryEntry {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  fighterId  Int
+  seed       Int      @default(0)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  fighter    Fighter  @relation(fields: [fighterId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, fighterId])
+}
+
+model Bracket {
+  id          Int      @id @default(autoincrement())
+  categoryId  Int      @unique
+  size        Int
+  generatedAt DateTime @default(now())
+  locked      Boolean  @default(false)
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  matches     Match[]
+}
+
+// Fighter ids on matches are plain Int? (resolved via the category roster in the service layer)
+// to keep the schema free of many mandatory back-relations. Routing between matches is derived
+// from (round, position) heap arithmetic in services/bracket.ts.
+model Match {
+  id          Int      @id @default(autoincrement())
+  bracketId   Int
+  round       Int
+  position    Int
+  slotALabel  String? // human-readable source, e.g. "Winner QF1"
+  slotBLabel  String?
+  fighterAId  Int?
+  fighterBId  Int?
+  winnerId    Int?
+  loserId     Int?
+  decision    String? // ippon | waza-ari | hantei | shikkaku | kiken | walkover
+  scoreA      Int?
+  scoreB      Int?
+  extensions  String   @default("[]") // JSON array
+  durationSec Int?
+  notes       String?
+  isBronze    Boolean  @default(false)
+  isFinal     Boolean  @default(false)
+  status      String   @default("pending") // pending | ready | done | bye
+  runOrder    Int      @default(0) // manual within-round running order (postpone a late fighter's bout)
+  version     Int      @default(0)
+  updatedById Int?
+  updatedAt   DateTime @updatedAt
+
+  bracket Bracket @relation(fields: [bracketId], references: [id], onDelete: Cascade)
+
+  @@index([bracketId])
+}
+
+model Placement {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  place      Int
+  fighterId  Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, place])
+}
+
+model AuditLog {
+  id       Int      @id @default(autoincrement())
+  userId   Int?
+  entity   String
+  entityId String
+  action   String
+  before   String? // JSON
+  after    String? // JSON
+  at       DateTime @default(now())
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+}
+
+model ImportBatch {
+  id         Int      @id @default(autoincrement())
+  eventId    Int
+  filename   String
+  rowCount   Int
+  okCount    Int
+  errorCount Int
+  byUserId   Int?
+  at         DateTime @default(now())
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model AppSetting {
+  key   String @id
+  value String // JSON
+}

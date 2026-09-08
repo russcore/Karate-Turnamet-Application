@@ -1,0 +1,31 @@
+{
+  "name": "karate-tournament",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portable karate tournament (tatami) management app — Fastify + React + Prisma/SQLite, no Docker.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "setup": "npm install && npm run prisma:generate && npm run prisma:push && npm run seed",
+    "dev": "concurrently -n server,client -c blue,green \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm --workspace server run dev",
+    "dev:client": "npm --workspace client run dev",
+    "build": "npm --workspace client run build && npm --workspace server run build",
+    "start": "npm --workspace server run start",
+    "serve": "npm run build && npm --workspace server run start -- 80",
+    "seed": "npm --workspace server run seed",
+    "seed:demo": "npm --workspace server run seed:demo",
+    "test": "npm --workspace server run test",
+    "prisma:generate": "npm --workspace server run prisma:generate",
+    "prisma:push": "npm --workspace server run prisma:push",
+    "prisma:migrate": "npm --workspace server run prisma:migrate"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
