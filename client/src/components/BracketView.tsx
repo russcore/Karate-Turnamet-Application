@@ -1,4 +1,5 @@
 import MatchCard from './MatchCard';
+import type { TimerEvt } from './BoutTimer';
 import UpNext from './UpNext';
 import { useI18n } from '../i18n';
 import { fighterMap, type BracketState } from '../lib/bracketTypes';
@@ -16,6 +17,7 @@ interface Props {
   onRevert?: (matchId: number) => void;
   onTimeUp?: (label: string) => void;
   onReorder?: (matchId: number, direction: 'now' | 'later') => void;
+  onTimer?: (evt: TimerEvt & { label?: string }) => void;
 }
 
 const roundName = (r: number, R: number): string => {
@@ -24,7 +26,7 @@ const roundName = (r: number, R: number): string => {
   return `Round ${r}`;
 };
 
-export default function BracketView({ state, editable, tatamiName, tatamiImage, categoryName, showUpNext = true, boutDurationSec, onPickWinner, onRevert, onTimeUp, onReorder }: Props) {
+export default function BracketView({ state, editable, tatamiName, tatamiImage, categoryName, showUpNext = true, boutDurationSec, onPickWinner, onRevert, onTimeUp, onReorder, onTimer }: Props) {
   const { t } = useI18n();
   const fmap = fighterMap(state);
   const size = state.bracket.size;
@@ -55,6 +57,7 @@ export default function BracketView({ state, editable, tatamiName, tatamiImage, 
       onRevert={() => onRevert?.(m.id)}
       onTimeUp={onTimeUp}
       onReorder={(dir) => onReorder?.(m.id, dir)}
+      onTimer={onTimer}
     />
   );
 

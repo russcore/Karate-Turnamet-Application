@@ -4,7 +4,7 @@ import { prisma } from '../db.js';
 import { requireAuth, requireMatchTatamiAccess } from '../auth/guards.js';
 import { clearMatchResult, getBracketState, reorderMatch, setMatchResult, VersionConflictError } from '../services/bracket.js';
 import { DECISIONS } from '../types.js';
-import { notifyCategory } from '../ws/hub.js';
+import { notifyCategory, notifyTimer } from '../ws/hub.js';
 
 async function tatamiOf(categoryId: number): Promise<number | null> {
   const c = await prisma.category.findUnique({ where: { id: categoryId }, select: { tatamiId: true } });
@@ -68,6 +68,25 @@ export default async function matchRoutes(app: FastifyInstance): Promise<void> {
     } catch (err) {
       return reply.code(400).send({ error: (err as Error).message });
     }
+  });
+
+  // Broadcast a bout/break timer's state for an arena so projector screens show it live.
+  app.post('/timer', async (request, reply) => {
+    const schema = z.object({
+      tatamiId: z.number().int(),
+      kind: z.enum(['bout', 'break']),
+      state: z.enum(['running', 'paused', 'reset', 'done']),
+      remaining: z.number().int().min(0).optional(),
+      durationSec: z.number().int().optional(),
+      label: z.string().max(160).optional(),
+      categoryId: z.number().int().optional(),
+    });
+    const parsed = schema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: parsed.error.message });
+    const { tatamiId, kind, state, remaining, durationSec, label, categoryId } = parsed.data;
+    const endsAt = state === 'running' && remaining != null ? Date.now() + remaining * 1000 : null;
+    notifyTimer(tatamiId, { kind, state, endsAt, remaining, durationSec, label, categoryId });
+    return { ok: true };
   });
 
   // Append an extension/round entry before a winner is set ("if this round" chains).

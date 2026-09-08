@@ -55,3 +55,13 @@ export function notifyConfig(): void {
 export function notifyPodium(categoryId: number): void {
   hub.publish('all', { type: 'podium', categoryId, at: Date.now() });
 }
+
+/** Broadcast a bout/break timer's state for one arena so projectors can show it live. */
+export function notifyTimer(
+  tatamiId: number,
+  data: { kind: 'bout' | 'break'; state: string; endsAt: number | null; remaining?: number; durationSec?: number; label?: string; categoryId?: number },
+): void {
+  const payload = { type: 'timer', tatamiId, ...data, at: Date.now() };
+  hub.publish('all', payload);
+  hub.publish(`tatami:${tatamiId}`, payload);
+}

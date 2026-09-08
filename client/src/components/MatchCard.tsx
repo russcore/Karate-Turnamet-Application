@@ -1,5 +1,5 @@
 import RankChip from './RankChip';
-import BoutTimer from './BoutTimer';
+import BoutTimer, { type TimerEvt } from './BoutTimer';
 import { useI18n } from '../i18n';
 import { displaySlotLabel } from '../lib/labels';
 import { useEvent } from '../lib/queries';
@@ -19,13 +19,14 @@ interface Props {
   onRevert?: () => void;
   onTimeUp?: (label: string) => void;
   onReorder?: (direction: 'now' | 'later') => void;
+  onTimer?: (evt: TimerEvt & { label?: string }) => void;
 }
 
 function fighterLabel(f?: BracketFighter): string {
   return f ? `${f.firstName} ${f.lastName}` : '';
 }
 
-export default function MatchCard({ match, fighters, tatamiName, tatamiImage, categoryName, editable, order, isCurrent, boutDurationSec, onPickWinner, onRevert, onTimeUp, onReorder }: Props) {
+export default function MatchCard({ match, fighters, tatamiName, tatamiImage, categoryName, editable, order, isCurrent, boutDurationSec, onPickWinner, onRevert, onTimeUp, onReorder, onTimer }: Props) {
   const { t } = useI18n();
   const { data: event } = useEvent();
   const cornerA = { name: event?.cornerAName ?? 'AO', color: event?.cornerAColor ?? '#2563eb' };
@@ -122,7 +123,7 @@ export default function MatchCard({ match, fighters, tatamiName, tatamiImage, ca
       </div>
 
       {editable && boutDurationSec != null && match.status === 'ready' && isCurrent && (
-        <BoutTimer compact durationSec={boutDurationSec} onFinish={() => onTimeUp?.(boutLabel)} />
+        <BoutTimer compact durationSec={boutDurationSec} onFinish={() => onTimeUp?.(boutLabel)} onTimer={(evt) => onTimer?.({ ...evt, label: boutLabel })} />
       )}
 
       {/* Reorder within the round: postpone the current bout (late fighter) or bring one forward. */}

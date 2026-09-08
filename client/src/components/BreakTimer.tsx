@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n';
 import { ensureAudio, playAlarm } from '../lib/alarm';
+import type { TimerEvt } from './BoutTimer';
 
 // Break between fights on a tatami — capped at 5 minutes.
 const MAX = 300;
@@ -8,7 +9,7 @@ const PRESETS = [60, 120, 180, 240, 300];
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 /** A tatami-wide "break before the next fight" countdown (max 5 min), with an alarm at 0. */
-export default function BreakTimer() {
+export default function BreakTimer({ onTimer }: { onTimer?: (evt: TimerEvt) => void }) {
   const { t } = useI18n();
   const [dur, setDur] = useState(120);
   const [remaining, setRemaining] = useState(120);
@@ -16,8 +17,12 @@ export default function BreakTimer() {
   const [done, setDone] = useState(false);
   const remRef = useRef(remaining);
   remRef.current = remaining;
+  const onTimerRef = useRef(onTimer);
+  onTimerRef.current = onTimer;
+  const emit = (state: TimerEvt['state'], rem: number) => onTimerRef.current?.({ state, remaining: rem, durationSec: dur });
 
   useEffect(() => { setRemaining(dur); setDone(false); setRunning(false); }, [dur]);
+  useEffect(() => { if (done) emit('done', 0); }, [done]);
 
   useEffect(() => {
     if (!running) return;
@@ -30,8 +35,9 @@ export default function BreakTimer() {
     return () => clearInterval(iv);
   }, [running]);
 
-  const start = () => { ensureAudio(); if (done) { setRemaining(dur); setDone(false); } setRunning(true); };
-  const reset = () => { setRunning(false); setDone(false); setRemaining(dur); };
+  const start = () => { ensureAudio(); const rem = done ? dur : remaining; if (done) { setRemaining(dur); setDone(false); } setRunning(true); emit('running', rem); };
+  const pause = () => { setRunning(false); emit('paused', remRef.current); };
+  const reset = () => { setRunning(false); setDone(false); setRemaining(dur); emit('reset', dur); };
   const idle = !running && !done && remaining === dur;
 
   return (
@@ -51,7 +57,7 @@ export default function BreakTimer() {
       <div className="ml-auto flex gap-2">
         {!running
           ? <button className="btn-primary text-xs" onClick={start}>▶ {t('timer.start')}</button>
-          : <button className="btn-ghost text-xs" onClick={() => setRunning(false)}>⏸ {t('timer.pause')}</button>}
+          : <button className="btn-ghost text-xs" onClick={pause}>⏸ {t('timer.pause')}</button>}
         <button className="btn-ghost text-xs" onClick={reset}>↺ {t('timer.reset')}</button>
       </div>
     </div>

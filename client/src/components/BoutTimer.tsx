@@ -5,8 +5,10 @@ import { ensureAudio, playAlarm } from '../lib/alarm';
 const PRESETS = [60, 90, 105, 110, 120, 150, 180];
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
+export interface TimerEvt { state: 'running' | 'paused' | 'reset' | 'done'; remaining: number; durationSec: number }
+
 /** Per-bout countdown timer with its own configurable duration. Flashes + alarms at 0. */
-export default function BoutTimer({ durationSec, compact, onFinish }: { durationSec: number; compact?: boolean; onFinish?: () => void }) {
+export default function BoutTimer({ durationSec, compact, onFinish, onTimer }: { durationSec: number; compact?: boolean; onFinish?: () => void; onTimer?: (evt: TimerEvt) => void }) {
   const { t } = useI18n();
   const [dur, setDur] = useState(durationSec);
   const [remaining, setRemaining] = useState(durationSec);
@@ -16,9 +18,12 @@ export default function BoutTimer({ durationSec, compact, onFinish }: { duration
   remRef.current = remaining;
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
+  const onTimerRef = useRef(onTimer);
+  onTimerRef.current = onTimer;
+  const emit = (state: TimerEvt['state'], rem: number) => onTimerRef.current?.({ state, remaining: rem, durationSec: dur });
 
   // Fire the time-up callback once, when the countdown reaches zero.
-  useEffect(() => { if (done) onFinishRef.current?.(); }, [done]);
+  useEffect(() => { if (done) { onFinishRef.current?.(); emit('done', 0); } }, [done]);
 
   // Follow the group default until the referee changes this bout's own duration.
   useEffect(() => { setDur(durationSec); }, [durationSec]);
@@ -37,10 +42,13 @@ export default function BoutTimer({ durationSec, compact, onFinish }: { duration
 
   const start = () => {
     ensureAudio();
+    const rem = done ? dur : remaining;
     if (done) { setRemaining(dur); setDone(false); }
     setRunning(true);
+    emit('running', rem);
   };
-  const reset = () => { setRunning(false); setDone(false); setRemaining(dur); };
+  const pause = () => { setRunning(false); emit('paused', remRef.current); };
+  const reset = () => { setRunning(false); setDone(false); setRemaining(dur); emit('reset', dur); };
   const idle = !running && !done && remaining === dur;
   const presets = [...new Set([...PRESETS, dur])].sort((a, b) => a - b);
 
@@ -60,7 +68,7 @@ export default function BoutTimer({ durationSec, compact, onFinish }: { duration
         {!running ? (
           <button className="text-sm text-emerald-600" onClick={start} title={t('timer.start')}>▶</button>
         ) : (
-          <button className="text-sm text-slate-500" onClick={() => setRunning(false)} title={t('timer.pause')}>⏸</button>
+          <button className="text-sm text-slate-500" onClick={pause} title={t('timer.pause')}>⏸</button>
         )}
         <button className="text-sm text-slate-400" onClick={reset} title={t('timer.reset')}>↺</button>
       </div>
@@ -80,7 +88,7 @@ export default function BoutTimer({ durationSec, compact, onFinish }: { duration
         </span>
       )}
       <div className="ml-auto flex gap-2">
-        {!running ? <button className="btn-primary text-xs" onClick={start}>▶ {t('timer.start')}</button> : <button className="btn-ghost text-xs" onClick={() => setRunning(false)}>⏸ {t('timer.pause')}</button>}
+        {!running ? <button className="btn-primary text-xs" onClick={start}>▶ {t('timer.start')}</button> : <button className="btn-ghost text-xs" onClick={pause}>⏸ {t('timer.pause')}</button>}
         <button className="btn-ghost text-xs" onClick={reset}>↺ {t('timer.reset')}</button>
       </div>
     </div>

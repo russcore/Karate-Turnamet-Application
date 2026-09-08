@@ -75,6 +75,11 @@ export default function BracketPage() {
     onSuccess: (state) => qc.setQueryData(['bracket', id], state),
     onError: (e) => { alert((e as Error).message); qc.invalidateQueries({ queryKey: ['bracket', id] }); },
   });
+  // Broadcast the bout/break timer to projector screens on this arena (fire-and-forget).
+  const timerBroadcast = (kind: 'bout' | 'break', evt: { state: string; remaining: number; durationSec: number; label?: string }) => {
+    if (cat?.tatamiId == null) return;
+    api.post('/api/matches/timer', { tatamiId: cat.tatamiId, kind, categoryId: id, state: evt.state, remaining: evt.remaining, durationSec: evt.durationSec, label: evt.label }).catch(() => {});
+  };
   const announce = useMutation({ mutationFn: () => api.post(`/api/categories/${id}/announce`), onError: (e: any) => alert(e.message) });
 
   if (bracket.isError) return <div className="text-slate-500">{t('bracket.notGenerated')}</div>;
@@ -101,7 +106,7 @@ export default function BracketPage() {
         </div>
       )}
 
-      {canEdit && bracket.data.placements.length === 0 && <BreakTimer />}
+      {canEdit && bracket.data.placements.length === 0 && <BreakTimer onTimer={(evt) => timerBroadcast('break', { ...evt, label: t('break.title') })} />}
 
       <BracketView
         state={bracket.data}
@@ -114,6 +119,7 @@ export default function BracketPage() {
         onRevert={(matchId) => setConfirmRevert(matchId)}
         onTimeUp={(label) => setTimeUp(label)}
         onReorder={canEdit ? (matchId, direction) => reorder.mutate({ matchId, direction }) : undefined}
+        onTimer={canEdit ? (evt) => timerBroadcast('bout', evt) : undefined}
       />
 
       {pendingWin && (
