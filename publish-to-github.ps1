@@ -95,9 +95,17 @@ else {
     Write-Host "           .\publish-to-github.ps1 -RemoteUrl https://github.com/<you>/$RepoName.git" -ForegroundColor White
     exit 1
   }
-  Info "Creating $((if($Public){'public'}else{'private'})) GitHub repo '$RepoName' and pushing"
-  gh repo create $RepoName $visibility --source=. --remote=origin --push
-  if ($LASTEXITCODE -ne 0) { Fail "gh repo create failed (are you authenticated? run 'gh auth login')." }
+  $hasOrigin = @(git remote) -contains 'origin'
+  if ($hasOrigin) {
+    Info "Remote 'origin' already configured - pushing"
+    git push -u origin main
+    if ($LASTEXITCODE -ne 0) { Fail "git push failed." }
+  } else {
+    $visWord = if ($Public) { 'public' } else { 'private' }
+    Info "Creating $visWord GitHub repo '$RepoName' and pushing"
+    gh repo create $RepoName $visibility --source=. --remote=origin --push
+    if ($LASTEXITCODE -ne 0) { Fail "gh repo create failed (the repo may already exist - create it on github.com and re-run with -RemoteUrl, or run 'gh auth login')." }
+  }
   Ok "Repository created and pushed"
 }
 
