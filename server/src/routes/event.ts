@@ -10,6 +10,7 @@ const updateSchema = z.object({
   title: z.string().min(1).optional(),
   subtitle: z.string().nullable().optional(),
   accentColor: z.string().optional(),
+  topBarColor: z.string().optional(),
   bronzeMode: z.enum(['single', 'double']).optional(),
   cornerAName: z.string().min(1).max(12).optional(),
   cornerAColor: z.string().optional(),

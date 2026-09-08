@@ -17,6 +17,7 @@ model Event {
   subtitle           String?
   logoPath           String?
   accentColor        String   @default("#e11d48")
+  topBarColor        String   @default("#0b1220")
   bronzeMode         String   @default("single") // "single" | "double"
   defaultTatamiImage String?
   cornerAName        String   @default("AO") // top fighter corner (blue by default)

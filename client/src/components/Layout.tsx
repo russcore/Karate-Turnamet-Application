@@ -78,12 +78,16 @@ export default function Layout() {
       </aside>
 
       <div className="app-shell flex min-w-0 flex-1 flex-col">
-        {/* Top bar: logo on the left, tournament name centred. */}
-        <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-6 py-3 backdrop-blur">
-          <img src={event?.logoPath || '/canva-logo.png'} alt="logo" className="h-9 w-9 shrink-0 rounded-lg object-contain" />
+        {/* Top bar: logo on the left, tournament name centred. Colour matches the sidebar
+            by default and is configurable in Branding (event.topBarColor). */}
+        <header
+          className="sticky top-0 z-10 flex items-center gap-3 border-b border-white/10 px-6 py-3"
+          style={{ background: event?.topBarColor || 'var(--sidebar)' }}
+        >
+          <img src={event?.logoPath || '/canva-logo.png'} alt="logo" className="h-9 w-9 shrink-0 rounded-lg object-contain ring-1 ring-white/15" />
           <div className="flex-1 text-center leading-tight">
-            <div className="text-lg font-bold text-slate-900">{event?.title ?? t('app.title')}</div>
-            {event?.subtitle && <div className="text-xs text-slate-500">{event.subtitle}</div>}
+            <div className="text-lg font-bold text-white">{event?.title ?? t('app.title')}</div>
+            {event?.subtitle && <div className="text-xs text-slate-300">{event.subtitle}</div>}
           </div>
           <div className="h-9 w-9 shrink-0" aria-hidden="true" />
         </header>

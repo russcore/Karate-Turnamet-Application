@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
+import { useEvent } from '../lib/queries';
 import { useI18n } from '../i18n';
 import { ApiError } from '../lib/api';
 
 export default function Login() {
   const { user, login } = useAuth();
+  const { data: event } = useEvent();
   const { t } = useI18n();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -36,8 +38,9 @@ export default function Login() {
     >
       <form onSubmit={submit} className="card w-full max-w-sm p-6 shadow-2xl backdrop-blur">
         <div className="mb-5 flex flex-col items-center gap-2 text-center">
-          <img src="/canva-logo.png" alt="logo" className="h-20 w-20 drop-shadow" />
-          <h1 className="text-xl font-bold text-slate-900">{t('app.title')}</h1>
+          <img src={event?.logoPath || '/canva-logo.png'} alt="logo" className="h-20 w-20 rounded-2xl object-contain drop-shadow" />
+          <h1 className="text-xl font-bold leading-tight text-slate-900">{event?.title ?? t('app.title')}</h1>
+          {event?.subtitle && <p className="text-sm font-medium text-slate-600">{event.subtitle}</p>}
           <p className="text-sm text-slate-500">{t('login.title')}</p>
         </div>
         {error && <div className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}

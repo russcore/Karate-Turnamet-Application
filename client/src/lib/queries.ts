@@ -7,6 +7,7 @@ export interface EventBranding {
   subtitle: string | null;
   logoPath: string | null;
   accentColor: string;
+  topBarColor: string;
   bronzeMode: 'single' | 'double';
   defaultTatamiImage: string | null;
   cornerAName: string;

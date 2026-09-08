@@ -65,7 +65,8 @@ export default function BracketView({ state, editable, tatamiName, tatamiImage, 
     <div className="space-y-6">
       {showUpNext && <UpNext state={state} />}
 
-      <div className="flex gap-8 overflow-x-auto pb-4">
+      {/* p-1 gives the current bout's green ring room so it isn't clipped by overflow. */}
+      <div className="flex gap-8 overflow-x-auto p-1 pb-4">
         {earlyRounds.map((r) => {
           const matches = state.bracket.matches
             .filter((m) => m.round === r && !m.isBronze)
