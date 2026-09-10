@@ -18,6 +18,7 @@ import TatamiView from './pages/TatamiView';
 import Projector from './pages/Projector';
 import Print from './pages/Print';
 import About from './pages/About';
+import Scores from './pages/Scores';
 import type { ReactNode } from 'react';
 
 function Protected({ children, roles }: { children: ReactNode; roles?: string[] }) {
@@ -58,6 +59,7 @@ export default function App() {
         <Route path="config/reset" element={<Protected roles={['admin']}><Reset /></Protected>} />
         <Route path="my-tatami" element={<TatamiView />} />
         <Route path="bracket/:categoryId" element={<BracketPage />} />
+        <Route path="scores" element={<Scores />} />
         <Route path="about" element={<About />} />
       </Route>
 

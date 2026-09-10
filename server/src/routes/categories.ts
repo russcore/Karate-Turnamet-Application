@@ -28,6 +28,45 @@ export default async function categoryRoutes(app: FastifyInstance): Promise<void
     }));
   });
 
+  // Results/scoreboard: every category with its podium (places 1-3) + a medal tally by school.
+  app.get('/results', async () => {
+    const eventId = await getActiveEventId();
+    const cats = await prisma.category.findMany({
+      where: { eventId },
+      include: { tatami: { select: { id: true, name: true } }, placements: { orderBy: { place: 'asc' } } },
+      orderBy: [{ tatamiId: 'asc' }, { order: 'asc' }],
+    });
+    const fighterIds = [...new Set(cats.flatMap((c) => c.placements.map((p) => p.fighterId)))];
+    const fighters = fighterIds.length
+      ? await prisma.fighter.findMany({ where: { id: { in: fighterIds } }, select: { id: true, firstName: true, lastName: true, school: true } })
+      : [];
+    const fmap = new Map(fighters.map((f) => [f.id, f]));
+
+    const tally = new Map<string, { school: string; gold: number; silver: number; bronze: number }>();
+    const categories = cats.map((c) => {
+      const medals = c.placements
+        .filter((p) => p.place <= 3)
+        .map((p) => {
+          const f = fmap.get(p.fighterId);
+          const school = f?.school ?? '—';
+          if (p.place <= 3) {
+            const row = tally.get(school) ?? { school, gold: 0, silver: 0, bronze: 0 };
+            if (p.place === 1) row.gold++;
+            else if (p.place === 2) row.silver++;
+            else row.bronze++;
+            tally.set(school, row);
+          }
+          return { place: p.place, name: f ? `${f.firstName} ${f.lastName}` : String(p.fighterId), school };
+        });
+      return {
+        id: c.id, name: c.name, status: c.status, isSpecial: c.isSpecial,
+        tatamiId: c.tatamiId, tatamiName: c.tatami?.name ?? null, medals,
+      };
+    });
+    const schools = [...tally.values()].sort((a, b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze);
+    return { categories, schools };
+  });
+
   app.get('/:id', async (request, reply) => {
     const id = Number((request.params as any).id);
     const cat = await prisma.category.findUnique({

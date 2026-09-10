@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../lib/api';
 import { useTatamis } from '../../lib/queries';
+import { useArenaTerm } from '../../lib/useArenaTerm';
 import { useI18n } from '../../i18n';
 
 export default function TatamiSetup() {
   const { t } = useI18n();
+  const term = useArenaTerm();
   const { data: tatamis } = useTatamis();
   const qc = useQueryClient();
   const [newName, setNewName] = useState('');
@@ -18,7 +20,7 @@ export default function TatamiSetup() {
 
   return (
     <div className="max-w-2xl space-y-5">
-      <h1 className="text-2xl font-bold text-slate-900">{t('tatami.title')}</h1>
+      <h1 className="text-2xl font-bold text-slate-900">{term}</h1>
 
       <div className="card p-4">
         <div className="flex gap-2">

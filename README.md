@@ -59,10 +59,12 @@ npm run dev           # or: npm run serve   (production, port 80)
 | ![Bracket](docs/screenshots/05-bracket.png) | ![Fighters](docs/screenshots/03-fighters.png) |
 | **Import roster** | **Belts / ranks** |
 | ![Import](docs/screenshots/06-import.png) | ![Ranks](docs/screenshots/08-ranks.png) |
+| **Scores (medal table + per-arena results)** | **Projector (live arena board)** |
+| ![Scores](docs/screenshots/11-scores.png) | ![Projector](docs/screenshots/10-projector.png) |
 | **About** | **Login** |
 | ![About](docs/screenshots/09-about.png) | ![Login](docs/screenshots/01-login.png) |
 
-More in [`docs/screenshots/`](docs/screenshots/) (branding, projector, …).
+More in [`docs/screenshots/`](docs/screenshots/) (branding, import, …).
 
 ## 📖 Documentation
 

@@ -11,6 +11,7 @@ const updateSchema = z.object({
   subtitle: z.string().nullable().optional(),
   accentColor: z.string().optional(),
   topBarColor: z.string().optional(),
+  arenaTerm: z.string().max(40).nullable().optional(),
   bronzeMode: z.enum(['single', 'double']).optional(),
   cornerAName: z.string().min(1).max(12).optional(),
   cornerAColor: z.string().optional(),

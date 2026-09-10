@@ -2,10 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useTatamis } from '../lib/queries';
+import { useArenaTerm } from '../lib/useArenaTerm';
 import { useI18n } from '../i18n';
 
 export default function Dashboard() {
   const { t } = useI18n();
+  const term = useArenaTerm();
   const { data: tatamis } = useTatamis();
   const { data: fighterCount } = useQuery({ queryKey: ['fighters', 'count'], queryFn: () => api.get('/api/fighters/count') });
   const { data: categories } = useQuery({ queryKey: ['categories'], queryFn: () => api.get('/api/categories') });
@@ -30,7 +32,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         <Stat label={t('dashboard.fighters')} value={fighterCount?.count ?? 0} />
         <Stat label={t('dashboard.categories')} value={cats.length} />
-        <Stat label={t('dashboard.tatamis')} value={tatamis?.length ?? 0} />
+        <Stat label={term} value={tatamis?.length ?? 0} />
       </div>
 
       <div className="card p-5">

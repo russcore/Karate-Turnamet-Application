@@ -11,6 +11,7 @@ export default function Branding() {
   const [form, setForm] = useState({
     title: '',
     subtitle: '',
+    arenaTerm: '',
     accentColor: '#e11d48',
     topBarColor: '#0b1220',
     bronzeMode: 'single' as 'single' | 'double',
@@ -25,6 +26,7 @@ export default function Branding() {
       setForm({
         title: event.title,
         subtitle: event.subtitle ?? '',
+        arenaTerm: event.arenaTerm ?? '',
         accentColor: event.accentColor,
         topBarColor: event.topBarColor ?? '#0b1220',
         bronzeMode: event.bronzeMode,
@@ -36,7 +38,7 @@ export default function Branding() {
   }, [event]);
 
   const save = useMutation({
-    mutationFn: () => api.put('/api/event', form),
+    mutationFn: () => api.put('/api/event', { ...form, arenaTerm: form.arenaTerm.trim() || null }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['event'] }),
   });
 
@@ -61,6 +63,11 @@ export default function Branding() {
         <div>
           <label className="label">{t('branding.subtitle')}</label>
           <input className="input" value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} />
+        </div>
+        <div>
+          <label className="label">{t('branding.arenaTerm')}</label>
+          <input className="input" placeholder="Arena / Tatami / Ring / Mat…" value={form.arenaTerm} onChange={(e) => setForm({ ...form, arenaTerm: e.target.value })} />
+          <div className="mt-0.5 text-[11px] text-slate-400">{t('branding.arenaTermHint')}</div>
         </div>
         <div className="flex items-center gap-4">
           <div>

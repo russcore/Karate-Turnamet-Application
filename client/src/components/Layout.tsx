@@ -2,12 +2,14 @@ import { useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { useEvent } from '../lib/queries';
+import { useArenaTerm } from '../lib/useArenaTerm';
 import { LanguageSwitcher, useI18n } from '../i18n';
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const { t } = useI18n();
   const { data: event } = useEvent();
+  const term = useArenaTerm();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function Layout() {
               {link('/categories', t('nav.categories'))}
               <div className="side-section">Configuration</div>
               {link('/config/branding', t('nav.branding'))}
-              {link('/config/tatami', t('nav.tatami'))}
+              {link('/config/tatami', term)}
               {link('/config/ranks', t('nav.ranks'))}
               {link('/config/users', t('nav.users'))}
               {link('/config/settings', t('nav.settings'))}
@@ -52,6 +54,7 @@ export default function Layout() {
             </>
           )}
           <div className="side-section">View</div>
+          {link('/scores', t('nav.scores'))}
           <Link to="/projector" target="_blank" className="side-link">
             {t('nav.projector')} ↗
           </Link>

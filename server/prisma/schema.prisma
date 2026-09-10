@@ -18,6 +18,7 @@ model Event {
   logoPath           String?
   accentColor        String   @default("#e11d48")
   topBarColor        String   @default("#0b1220")
+  arenaTerm          String? // admin-configurable label for "Arena"/"Tatami" (free text; null = use translation)
   bronzeMode         String   @default("single") // "single" | "double"
   defaultTatamiImage String?
   cornerAName        String   @default("AO") // top fighter corner (blue by default)
