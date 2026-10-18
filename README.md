@@ -104,10 +104,10 @@ No database server, no containers — everything travels in the folder.
 
 If you find this project useful, you can support its development:
 
-[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.me/YOUR_PAYPAL_USERNAME)
+[![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?logo=paypal&logoColor=white)](paypal.me/vpros)
 
 > **Placeholder** — replace `YOUR_PAYPAL_USERNAME` in the link above with your PayPal.Me
-> handle (e.g. `paypal.me/victorprusakov`) once your PayPal donation link is set up.
+> handle (e.g. `paypal.me/vpros`) once your PayPal donation link is set up.
 
 ---
 
